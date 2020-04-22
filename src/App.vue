@@ -1,16 +1,17 @@
 <template>
   <div id="app">
-    <UserList/>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-import UserList from './components/UserList.vue'
+// import UserList from './components/UserList.vue'
+//import LandingPage from './components/LandingPage.vue'
 
 export default {
   name: 'App',
   components: {
-    UserList
+    //LandingPage
   }
 }
 </script>
@@ -21,7 +22,7 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: red;
+  color:  darkcyan;
   margin-top: 60px;
 }
 </style>
