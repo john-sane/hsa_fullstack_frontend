@@ -2,14 +2,13 @@ import Vue from 'vue'
 import App from './App.vue'
 import store from './store'
 import router from './router'
+import Notifications from 'vue-notification'
 import axios from 'axios'
 
-
 Vue.config.productionTip = false
-
-// set auth header
-axios.defaults.headers.common['Authorization'] = `Bearer ${store.state.token}`
 axios.defaults.withCredentials = true
+
+Vue.use(Notifications)
 
 new Vue({
   router,

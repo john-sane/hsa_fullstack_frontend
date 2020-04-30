@@ -1,15 +1,15 @@
 <template>
   <div class="sign-in-container">
-      <form>
+      <form @submit.prevent>
         <h1>Login</h1>
         <label for="email">E-Mail
-          <input type="text" placeholder="E-Mail" v-model="email" />
+          <input type="email" placeholder="E-Mail" v-model="email" required/>
         </label>
         <label for="password">Passwort
-            <input type="text" placeholder="Dein Passwort" v-model="password"/>
+            <input type="password" placeholder="Dein Passwort" v-model="password" required/>
         </label>        
-        <input type="button" @click="login" value="Login" />
-        <p v-if="msg">{{ msg }}</p>
+        <input type="button" @click="login_user" value="Login" />
+        <p class="errors" v-for="error in errors" :key="error">{{ error }}</p>
         <p>
           <router-link to="/register">Oder Registrieren</router-link>
         </p>
@@ -17,35 +17,72 @@
   </div>
 </template>
 <script>
-import AuthService from '../services/AuthService.js';
+import { mapGetters, mapActions } from 'vuex';
+
 export default {
+  name: "SignIn",
+  computed: {
+    ...mapGetters(['getEmail'])
+  },
   data() {
     return {
+      errors: [],
       email: '',
       password: '',
-      msg: ''
     };
   },
   methods: {
-    async login() {
-      try {
-        const credentials = {
+    ...mapActions(['login', 'setCurrentUser', 'validateEmail']),
+    validate: async function (data){
+      if (!data.email){
+        this.$notify({
+          title: "Bitte gib eine E-Mail an",
+          type: 'error'
+        })
+        return false
+      }else if (data.email && !await this.validateEmail(data.email)){
+        this.$notify({
+          title: "Bitte gib eine korrekte E-Mail an",
+          type: 'error'
+        })
+      }else if (!data.password){
+        this.$notify({
+          title: "Bitte gib dein Passwort an",
+          type: 'error'
+        })
+        return false
+      } else {
+        return true
+      }
+    },
+    async login_user() {
+      const credentials = {
           email: this.email,
           password: this.password
-        };
-        const response = await AuthService.login(credentials)
-        console.log(response)
-        this.msg = response.msg
-        const token = response.user.forename
-        const user = response.user
-        this.$store.dispatch('login', { token, user })
-        this.$router.push('/')
-      } catch (error) {
-        this.msg = error.response.data.msg
+      }
+      if (await this.validate(credentials)){
+        await this.login(credentials)
+        .then((res) => {
+          this.setCurrentUser(res)
+          this.$router.push('/')
+          this.$notify({
+            title: `Hallo ${res.forename}, willkommen :)`,
+            type: 'success'
+          })
+        })
+        .catch((error) => {
+          this.$notify({
+            title: error,
+            type: 'error'
+          })
+        })
       }
     }
+  },
+  mounted() {
+    this.email = this.getEmail
   }
-};
+}
 </script>
 
 <style scoped>

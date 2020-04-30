@@ -1,59 +1,69 @@
 import axios from 'axios'
 
-const getDefaultState = () => {
-    return {
-      token: '',
-      user: {}
-    }
+const state = { 
+  user: {
+    email: "",
   }
-
-const state = getDefaultState()
+}
 
 const getters = {
-    isLoggedIn: state => {
-      return state.token;
-    },
     getUser: state => {
       return state.user;
+    },
+    getEmail: state => {
+      return state.user.email;
     }
 }
 
-/* const actions = {
-    async signInUser({ commit }) {
-        await axios.post(`http://localhost:4000/api/users/sign_in`)
-            .then((response) => {
-                commit("updateCurrentUser", response.data.data)
-            }, (error) => {
-                console.log(error);
-            })
-    }
-} */
-const actions = {
-    login: ({ commit }, { token, user }) => {
-      commit('SET_TOKEN', token)
-      commit('SET_USER', user)
-      // set auth header
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-      axios.defaults.withCredentials = true
-    },
-    logout: ({ commit }) => {
-      commit('RESET', '');
-    }
-  }
+const url = 'http://localhost:4000/api/'
 
-// const mutations = {
-//     updateCurrentUser: (state, currentUser) => (state.forename = currentUser.forename)
-// }
+const actions = {
+    async login( context, data) {
+      axios.defaults.withCredentials = true
+      return new Promise((resolve, reject) => {
+        axios.post(url + 'users/sign_in', data)
+          .then((response) => {
+            resolve(response.data.data.user)
+          })
+          .catch((error) => {
+            reject(error.response.data.errors.detail)
+          })
+      })
+    },
+    async validateEmail(context, mail){
+      const regex = /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>().,;\s@"]+.{0,1})+([^<>().,;:\s@"]{2,}|[\d.]+))$/
+      return regex.test(mail)
+    },
+    async setCurrentUser({ commit }, user_data) {
+      commit('SET_USER', user_data)
+    },
+    async signUp({ commit }, credentials) {
+      return new Promise((resolve, reject) => {
+        axios.post(url + 'users', credentials)
+          .then((response) => {
+            commit('SET_USER_EMAIL', response.data.data.email)
+            resolve(true)
+          })
+          .catch((error) => {
+            reject(error.response.data.errors.detail)
+          })
+      })
+    },
+    async logout({ commit }) {
+      axios.defaults.withCredentials = false
+      commit('RESET', '')
+    }
+}
 
 const mutations = {
-    SET_TOKEN: (state, token) => {
-      state.token = token;
-    },
     SET_USER: (state, user) => {
-      state.user = user;
+      state.user = user
+    },
+    SET_USER_EMAIL: (state, email) => {
+      state.user.email = email
     },
     RESET: state => {
-      Object.assign(state, getDefaultState());
+      state.user = { email: "" }
     }
 }
 

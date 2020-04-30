@@ -1,28 +1,26 @@
 <template>
   <div class="sign-in-container">
-      <form>
+      <form @submit.prevent >
             <h1>Jetzt Registrieren</h1>
             <label for="forename">Vorname
-                <input type="text" placeholder="Dein Vorname" v-model="forename"/>
+                <input type="text" placeholder="Dein Vorname" v-model="forename" required/>
             </label>
             <label for="surname">Nachname
-                <input type="text" placeholder="Dein Nachname" v-model="surname"/>
+                <input type="text" placeholder="Dein Nachname" v-model="surname" required/>
             </label>
             <label for="email">E-Mail
-                <input type="text" placeholder="Deine Email" v-model="email"/>
+                <input type="text" placeholder="Deine Email" v-model="email" required/>
             </label>
             <label for="password">Passwort
-                <input type="text" placeholder="Dein Passwort" v-model="password"/>
+                <input type="text" placeholder="Dein Passwort" v-model="password" required/>
             </label>
             <label for="gitlab_repo_link">Gitlab Repository Link (SSH)
-                <input type="text" placeholder="Link zu deinem Gitlab Repo" v-model="gitlab_repo_link"/>
+                <input type="text" placeholder="Link zu deinem Gitlab Repo" v-model="gitlab_repo_link" required/>
             </label>
             <label for="matriculation_number">Immatrikulationsnummer
-                <input type="text" placeholder="Immatrikulationsnummer" v-model="matriculation_number"/>
+                <input type="text" placeholder="Immatrikulationsnummer" v-model="matriculation_number" required/>
             </label>
             <input type="button" @click="register" value="Register" />
-            <p v-if="msg">{{ msg }}</p>
-
             <p>
               <router-link to="/sign-in">Oder Einloggen</router-link>
             </p>
@@ -32,7 +30,7 @@
 </template>
 
 <script>
-import AuthService from '../services/AuthService.js'
+import { mapActions } from 'vuex';
 
 export default {
     name: "Register",
@@ -45,12 +43,24 @@ export default {
             password_repeat: '',
             gitlab_repo_link: '',
             matriculation_number: '',
-            msg: ''
         }
     },
     methods: {
-    async register() {
-      try {
+      ...mapActions(['signUp']),
+      validateForm: function(data){
+        var anyMissing = false
+        for (const attr in data.user){
+          if (!data.user[attr]){
+            this.$notify({
+              title: `Das Feld ${attr} muss ausgefüllt sein`,
+              type: 'error'
+            })
+            anyMissing = true
+          }
+        }
+        return !anyMissing
+      },
+      async register() {
         const credentials = {
           user: {
             forename: this.forename,
@@ -60,14 +70,23 @@ export default {
             gitlab_repo_link: this.gitlab_repo_link,
             matriculation_number: this.matriculation_number,
           }
-        };
-        const response = await AuthService.signUp(credentials)
-        this.msg = response.msg
-        this.$router.push('/')
-      } catch (error) {
-        this.msg = error.response.data.msg
+        }
+        if (this.validateForm(credentials)){
+          await this.signUp(credentials)
+          .then((res) => {
+            if (res){
+              this.$router.push('/sign-in')
+            }
+          })
+          .catch((error) =>{
+            this.$notify({
+            title: error,
+            type: 'error'
+            })
+          })
+        }
+        
       }
-    }
   }
 }
 </script>

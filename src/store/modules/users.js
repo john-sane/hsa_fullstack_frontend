@@ -12,13 +12,17 @@ const getters = {
 
 const actions = {
     async fetchUsers({ commit }) {        
-        const response =  await axios.get(`http://localhost:4000/api/users`)
+        const response = await axios.get(`http://localhost:4000/api/users`)
         commit("setUsers", response.data.data)
-    }
+    },
+    async clear({ commit }) {
+        commit('clearUsers', '')
+      }
 }
 
 const mutations = {
-    setUsers: (state, allUsers) => (state.users = allUsers)
+    setUsers: (state, allUsers) => (state.users = allUsers),
+    clearUsers: (state) => (state.users = [])
 }
 
 export default{

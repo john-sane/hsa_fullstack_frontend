@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div class="users-page">
+    <h2>Hallo {{current_user.forename}}, diese Nutzer sind registriert:</h2>
     <ul>
       <li v-for="user in users" :key='user.email'>
         <User :user=user></User>
@@ -9,7 +10,6 @@
 </template>
 
 <script>
-// import axios from 'axios';
 import User from './User.vue';
 import { mapGetters, mapActions } from 'vuex';
 
@@ -24,32 +24,30 @@ export default {
   computed: {
     ...mapGetters(
       {
-        users: 'getUsers'
+        users: 'getUsers',
+        current_user: 'getUser',
       })
     },
   created() {
-    this.fetchUsers()
+    try {
+      this.fetchUsers()
+    } catch (error) {
+      this.$router.push('/')
+    }
+    
   }
-
-  // Fetches posts when the component is created.
-  //created() {
-  //  axios.get(`http://localhost:4000/api/users`)
-  //  .then(response => {
-  //    // JSON responses are automatically parsed.
-  //    this.users = response.data.data
-  //  })
-  //  .catch(e => {
-  //    this.errors.push(e)
-  //  })
-  //}
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+h2{
+  margin: auto;
+  margin-bottom: 2rem;
+}
 ul{
   list-style-type: none;
   max-width: 500px;
+  margin: auto;
 }
 li{
   margin: 10px;

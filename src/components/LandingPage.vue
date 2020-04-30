@@ -10,13 +10,27 @@
     <p>
       <router-link to="/users">Nutzerübersicht</router-link>
     </p>
+    <input type="button" @click="logOut" value="Log Out" />
   </div>
 </template>
 
 <script>
+import { mapActions } from 'vuex';
+
 export default {
-  name: "LandingPage"
-};
+  name: "LandingPage",
+  methods: {
+      ...mapActions(['clear', 'logout']),
+      async logOut() {
+          try {
+              this.clear()
+              this.logout()
+          } catch (error){
+              console.log("Log Out incomplete")
+          }
+      }
+  }
+}
 </script>
 
 <style scoped>
