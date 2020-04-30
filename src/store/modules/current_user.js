@@ -50,10 +50,21 @@ const actions = {
       })
     },
     async logout({ commit }) {
-      axios.defaults.withCredentials = false
-      commit('RESET', '')
-    }
+      return new Promise((resolve, reject) => {
+        console.log("sending logout post now")
+        axios.post(url + 'users/sign_out')
+          .then((response) => {
+            console.log(response)
+            commit('RESET', '')
+            resolve(true)
+          })
+          .catch((error) => {
+            reject(error.response.data.errors)
+          })
+      })
+    },
 }
+
 
 const mutations = {
     SET_USER: (state, user) => {

@@ -28,13 +28,19 @@ export default {
         current_user: 'getUser',
       })
     },
-  created() {
-    try {
-      this.fetchUsers()
-    } catch (error) {
+  async created() {
+    await this.fetchUsers()
+    .then((res) => {
+      console.log(res)
+    })
+    .catch((error) => {
+      this.$notify({
+        title: "Du bist nicht autorisiert, bitte melde dich an!",
+        type: 'error'
+      })
+      console.log("Error: " + error)
       this.$router.push('/')
-    }
-    
+    })
   }
 };
 </script>

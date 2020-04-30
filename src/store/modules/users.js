@@ -11,9 +11,17 @@ const getters = {
 }
 
 const actions = {
-    async fetchUsers({ commit }) {        
-        const response = await axios.get(`http://localhost:4000/api/users`)
-        commit("setUsers", response.data.data)
+    async fetchUsers({ commit }) {
+        return new Promise((resolve, reject) => {
+            axios.get(`http://localhost:4000/api/users`)
+            .then((response) => {
+                commit("setUsers", response.data.data)
+                resolve(true)
+            })
+            .catch((error) => {
+              reject(error.response.data.errors)
+            })
+        })
     },
     async clear({ commit }) {
         commit('clearUsers', '')

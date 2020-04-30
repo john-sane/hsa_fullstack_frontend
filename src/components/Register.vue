@@ -9,16 +9,16 @@
                 <input type="text" placeholder="Dein Nachname" v-model="surname" required/>
             </label>
             <label for="email">E-Mail
-                <input type="text" placeholder="Deine Email" v-model="email" required/>
+                <input type="email" placeholder="Deine Email" v-model="email" required/>
             </label>
             <label for="password">Passwort
-                <input type="text" placeholder="Dein Passwort" v-model="password" required/>
+                <input type="password" placeholder="Dein Passwort" v-model="password" required/>
             </label>
             <label for="gitlab_repo_link">Gitlab Repository Link (SSH)
-                <input type="text" placeholder="Link zu deinem Gitlab Repo" v-model="gitlab_repo_link" required/>
+                <input type="url" placeholder="Link zu deinem Gitlab Repo" v-model="gitlab_repo_link" required/>
             </label>
             <label for="matriculation_number">Immatrikulationsnummer
-                <input type="text" placeholder="Immatrikulationsnummer" v-model="matriculation_number" required/>
+                <input type="number" placeholder="Immatrikulationsnummer" v-model="matriculation_number" required/>
             </label>
             <input type="button" @click="register" value="Register" />
             <p>
@@ -46,8 +46,8 @@ export default {
         }
     },
     methods: {
-      ...mapActions(['signUp']),
-      validateForm: function(data){
+      ...mapActions(['signUp', 'validateEmail']),
+      validateForm: async function(data){
         var anyMissing = false
         for (const attr in data.user){
           if (!data.user[attr]){
@@ -56,6 +56,15 @@ export default {
               type: 'error'
             })
             anyMissing = true
+          }
+          if (attr == "email"){
+            if (!await this.validateEmail(data.user[attr])){
+              this.$notify({
+                title: "Bitte gib eine korrekte E-Mail an",
+                type: 'error'
+              })
+              anyMissing = true
+            }
           }
         }
         return !anyMissing
@@ -71,7 +80,7 @@ export default {
             matriculation_number: this.matriculation_number,
           }
         }
-        if (this.validateForm(credentials)){
+        if (await this.validateForm(credentials)){
           await this.signUp(credentials)
           .then((res) => {
             if (res){

@@ -10,7 +10,7 @@
     <p>
       <router-link to="/users">Nutzerübersicht</router-link>
     </p>
-    <input type="button" @click="logOut" value="Log Out" />
+    <input type="button" @click="logOutUser" value="Log Out" />
   </div>
 </template>
 
@@ -21,13 +21,19 @@ export default {
   name: "LandingPage",
   methods: {
       ...mapActions(['clear', 'logout']),
-      async logOut() {
-          try {
-              this.clear()
-              this.logout()
-          } catch (error){
-              console.log("Log Out incomplete")
-          }
+      async logOutUser() {
+        await this.logout()
+        .then((res) => {
+          this.clear()
+          console.log(res)
+          this.$notify({
+            title: "Du hast dich erfolgreich abgemeldet!",
+            type: 'success'
+          })
+        })
+        .catch((error) => {
+            console.log("Log Out incomplete" + error)
+        })
       }
   }
 }
