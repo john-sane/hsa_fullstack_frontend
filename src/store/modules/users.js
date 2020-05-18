@@ -13,7 +13,7 @@ const getters = {
 const actions = {
     async fetchUsers({ commit }) {
         return new Promise((resolve, reject) => {
-            axios.get(`http://localhost:4000/api/users`)
+            axios.get(`https://hsa-fullstack-backend.herokuapp.com:443/api/users`)
             .then((response) => {
                 commit("setUsers", response.data.data)
                 resolve(true)

@@ -15,7 +15,7 @@ const getters = {
     }
 }
 
-const url = 'http://localhost:4000/api/'
+const url = 'https://hsa-fullstack-backend.herokuapp.com:443/api/'
 
 const actions = {
     async login( context, data) {
